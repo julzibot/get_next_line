@@ -6,7 +6,7 @@
 /*   By: jibot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/14 16:20:05 by jibot             #+#    #+#             */
-/*   Updated: 2021/11/15 15:20:50 by jibot            ###   ########.fr       */
+/*   Updated: 2021/11/15 16:49:24 by jibot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
@@ -23,7 +23,6 @@ char	*get_next_line(int fd)
 	static char			s[1];
 	static unsigned int	i;
 
-	//i = 0;
 	while (*s != '\n' && i < BUFFER_SIZE + 1)
 	{
 		read(fd, s, 1);
@@ -45,6 +44,5 @@ int	main(void)
 	int	fd = open("testdoc.txt", O_RDONLY);
 
 	printf("%s", get_next_line(fd));
-
 	//fd = close(fd);
 }
