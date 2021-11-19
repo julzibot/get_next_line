@@ -6,7 +6,7 @@
 /*   By: jibot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/14 16:20:05 by jibot             #+#    #+#             */
-/*   Updated: 2021/11/19 18:31:09 by jibot            ###   ########.fr       */
+/*   Updated: 2021/11/19 22:05:58 by jibot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
@@ -51,41 +51,20 @@ int get_save(char *buffer, char *save)
 	}
 }
 
-char	*get_full_line(char *save, int fd)
+/*char	*get_full_line(char *save, int fd)
 {
-	int 	i;
-	char	s[1];
-
-	i = ft_strlen(save);
-	*s = save[i];
-	while (save[i] != '\n')
-	{
-		read(fd, s, 1);
-		save[i] = *s;
-		i++;
-	}
-	save[i] = '\0';
-	return (save);
-}
+}*/
 
 char	*get_next_line(int fd)
 {
 	char				buffer[BUFFER_SIZE + 1];
-	char				s[1];
 	static char			*save;
-	static char			*line;
+	char				*line;
 	int					i;
 	
 	i = get_save(buffer, save);
-	read(fd, s, 1);
-	while (*s && i < BUFFER_SIZE)
-	{
-		buffer[i] = *s;
-		read(fd, s, 1);
-		i++;
-	}
-	buffer[i] = *s;
-	buffer[i + 1] = '\0';
+	read(fd, buffer + i, BUFFER_SIZE - i);
+	buffer[BUFFER_SIZE] = '\0';
 	if (is_line(buffer) != 0)
 	{
 		save = ft_strdup(buffer + is_line(buffer) + 1);
@@ -95,16 +74,11 @@ char	*get_next_line(int fd)
 	else
 	{
 		save = ft_strdup(buffer);
-		while (is_line(save) == 0 )
+		while (is_line(save) == 0)
 		{
-			i = 0;
-			while (*s && i < BUFFER_SIZE)
-			{
-				read(fd, s, 1);
-				buffer[i] = *s;
-				i++;
-			}
-			buffer[i++] = '\0';
+			buffer[i] = '\0';
+			read(fd, buffer, BUFFER_SIZE);
+			buffer[BUFFER_SIZE] = '\0';
 			save = ft_strjoin(save, buffer);
 		}
 		line = ft_strdup(save);
@@ -117,9 +91,14 @@ char	*get_next_line(int fd)
 int	main(void)
 {
 	int	fd = open("testdoc.txt", O_RDONLY);
-	//int i = 0;
+	int i = 0;
+	char	*line;
 
-	//while (i++ < 8)
-	printf("%s", get_next_line(fd));
+	while (i++ < 9)
+	{
+		line = get_next_line(fd);
+		printf("%s", line);
+	}
+	free(line);
 	//fd = close(fd);
 }
