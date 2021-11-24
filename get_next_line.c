@@ -6,7 +6,7 @@
 /*   By: jibot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/14 16:20:05 by jibot             #+#    #+#             */
-/*   Updated: 2021/11/24 19:01:01 by jibot            ###   ########.fr       */
+/*   Updated: 2021/11/24 21:47:13 by jibot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
@@ -72,14 +72,24 @@ char	*get_next_line(int fd)
 	i = get_save(buffer, save);
 	ft_bzero(buffer + i, BUFFER_SIZE - i + 1);
 	nbyte = read(fd, buffer + i, BUFFER_SIZE - i);
-	if (i == -1 || !buffer[0] || nbyte < 0 || fd < 0 || fd > OPEN_MAX)
+	if ((i == -1 && nbyte < 0) || !buffer[0] || fd < 0 || fd > OPEN_MAX)
 		return (NULL);
 	else if (is_line(buffer) > 0 || buffer[0] == '\n')
 		line = ft_strdup(buffer);
 	else
 		line = get_full_line(ft_strdup(buffer), fd);
 	free(save);
-	if (is_line(line) && line[ft_strlen(line) - 1] != '\n')
+	if ((is_line(line) && line[ft_strlen(line) - 1] != '\n') || buffer[0] = '\n')
+	{
+		save = ft_strdup(line + is_line(line) + 1);
+		line[is_line(line) + 1] = '\0';
+	}
+	/*else if (buffer[0] == '\n')
+	{
+		save = NULL;
+		line[is_line(line) + 1] = '\0';
+	}*/
+	else if (line[ft_strlen(line) - 1] == '\n' && is_line(line) < ft_strlen(line) - 1)
 	{
 		save = ft_strdup(line + is_line(line) + 1);
 		line[is_line(line) + 1] = '\0';
