@@ -6,14 +6,14 @@
 /*   By: jibot <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/14 16:20:05 by jibot             #+#    #+#             */
-/*   Updated: 2021/11/24 21:47:13 by jibot            ###   ########.fr       */
+/*   Updated: 2021/11/25 13:19:08 by jibot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
 
 int	is_line(char *line)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (line[i] && line[i] != '\n')
@@ -24,9 +24,9 @@ int	is_line(char *line)
 		return (0);
 }
 
-int get_save(char *buffer, char *save)
+int	get_save(char *buffer, char *save)
 {
-	int 		i;
+	int			i;
 	static int	flag;
 
 	i = 0;
@@ -61,82 +61,44 @@ char	*get_full_line(char *line, int fd)
 	return (line);
 }
 
+char	*line_cut(char *line, char *buffer)
+{
+	int	i;
+	int	blen;
+
+	i = is_line(line);
+	blen = ft_strlen(line);
+	if ((i && line[blen - 1] != '\n') || (buffer[0] == '\n' && blen > 1)
+		|| (line[blen - 1] == '\n' && i < blen - 1 && blen > 1))
+		line[i + 1] = '\0';
+	return (line);
+}
+
 char	*get_next_line(int fd)
 {
-	char				buffer[BUFFER_SIZE + 1];
-	static char			*save;
-	char				*line;
-	int					i;
-	int					nbyte;
+	char		buffer[BUFFER_SIZE + 1];
+	static char	*save;
+	char		*line;
+	int			i;
+	int			blen;
 
 	i = get_save(buffer, save);
 	ft_bzero(buffer + i, BUFFER_SIZE - i + 1);
-	nbyte = read(fd, buffer + i, BUFFER_SIZE - i);
-	if ((i == -1 && nbyte < 0) || !buffer[0] || fd < 0 || fd > OPEN_MAX)
+	blen = read(fd, buffer + i, BUFFER_SIZE - i);
+	if ((i == -1 && blen < 0) || !buffer[0] || fd < 0 || fd > OPEN_MAX)
 		return (NULL);
 	else if (is_line(buffer) > 0 || buffer[0] == '\n')
 		line = ft_strdup(buffer);
 	else
 		line = get_full_line(ft_strdup(buffer), fd);
 	free(save);
-	if ((is_line(line) && line[ft_strlen(line) - 1] != '\n') || buffer[0] = '\n')
-	{
-		save = ft_strdup(line + is_line(line) + 1);
-		line[is_line(line) + 1] = '\0';
-	}
-	/*else if (buffer[0] == '\n')
-	{
-		save = NULL;
-		line[is_line(line) + 1] = '\0';
-	}*/
-	else if (line[ft_strlen(line) - 1] == '\n' && is_line(line) < ft_strlen(line) - 1)
-	{
-		save = ft_strdup(line + is_line(line) + 1);
-		line[is_line(line) + 1] = '\0';
-	}
+	i = is_line(line);
+	blen = ft_strlen(line);
+	if ((i && line[blen - 1] != '\n') || (buffer[0] == '\n' && blen > 1)
+		|| (line[blen - 1] == '\n' && i < blen - 1 && blen > 1))
+		save = ft_strdup(line + i + 1);
 	else
 		save = NULL;
+	line = line_cut(line, buffer);
 	return (line);
-	/*else if (is_line(buffer) > 0 || buffer[0] == '\n')
-	{
-		free(save);
-		if (buffer[BUFFER_SIZE - 1] == '\n')
-			save = NULL;
-		else
-			save = ft_strdup(buffer + is_line(buffer) + 1);
-		buffer[is_line(buffer) + 1] = '\0';
-		return (ft_strdup(buffer));
-	}
-	else
-	{
-		line = get_full_line(ft_strdup(buffer), fd);
-		free(save);
-		if (is_line(line) && line[ft_strlen(line) - 1] != '\n')
-		{
-			save = ft_strdup(line + is_line(line) + 1);
-			line[is_line(line) + 1] = '\0';
-		}
-		else
-			save = NULL;
-		return (line);
-	}*/
 }
-
-/*int	main(void)
-{
-	int	fd = open("testdoc.txt", O_RDONLY);
-	//int	fd = open("3char.txt", O_RDONLY);
-	//int	fd = open("BUFFER_SIZEnl.txt", O_RDONLY);
-	//int	fd = open("41_no_nl.txt", O_RDONLY);
-	//int	fd = open("41_with_nl.txt", O_RDONLY);
-	int i = 0;
-	char	*line;
-
-	while (i++ < 20)
-	{
-		line = get_next_line(fd);
-		printf("%s", line);
-	}
-	free(line);
-	//close(fd);
-}*/
